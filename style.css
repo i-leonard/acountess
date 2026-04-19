@@ -1,0 +1,53 @@
+:root {
+  --ink: #1a1a1a;
+  --paper: #faf8f4;
+  --accent: #6b4a82;
+  --rule: #e8e4dc;
+  --muted: #6b6b6b;
+}
+* { box-sizing: border-box; }
+html { background: var(--paper); }
+body {
+  font-family: Georgia, 'Times New Roman', serif;
+  color: var(--ink);
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 4rem 1.5rem 6rem;
+  line-height: 1.7;
+  font-size: 18px;
+}
+header { margin-bottom: 3rem; }
+.kicker {
+  color: var(--accent);
+  font-style: italic;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+}
+.kicker a { color: inherit; text-decoration: none; }
+.kicker a:hover { text-decoration: underline; }
+h1 {
+  font-weight: 400;
+  font-size: 2.25rem;
+  letter-spacing: -0.01em;
+  margin: 0.25rem 0 0;
+}
+p { margin: 1.25rem 0; }
+a { color: var(--accent); }
+a:hover { text-decoration-thickness: 2px; }
+nav {
+  font-size: 0.95rem;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rule);
+}
+nav a { margin-right: 1.5rem; color: var(--ink); }
+footer {
+  margin-top: 4rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+@media (max-width: 600px) {
+  body { padding: 2.5rem 1.25rem 4rem; font-size: 17px; }
+  h1 { font-size: 1.75rem; }
+}
