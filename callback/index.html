@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Callback — Acountess</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="/style.css">
+<style>
+  .callback-block {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.95rem;
+    width: 100%;
+    min-height: 8rem;
+    padding: 1rem;
+    border: 1px solid var(--rule);
+    background: #fff;
+    color: var(--ink);
+    border-radius: 4px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+  .instruction {
+    margin-top: 2rem;
+    padding: 1rem 1.25rem;
+    background: #fff;
+    border-left: 3px solid var(--accent);
+    font-size: 0.95rem;
+  }
+  .copy-button {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: var(--paper);
+    background: var(--accent);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .copy-button:hover { opacity: 0.9; }
+  .copy-button.copied { background: #2E8B57; }
+  .error-box {
+    margin-top: 1rem;
+    padding: 1rem 1.25rem;
+    background: #fff0f0;
+    border-left: 3px solid #d32f2f;
+    font-size: 0.95rem;
+    color: #5a1a1a;
+  }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<header>
+  <div class="kicker"><a href="/">acountess</a></div>
+  <h1>Authorization callback.</h1>
+</header>
+
+<div id="success-view" class="hidden">
+  <p>QuickBooks returned the values below. Copy the block and paste it into your terminal when prompted.</p>
+
+  <textarea id="callback-block" class="callback-block" readonly spellcheck="false" aria-label="Authorization values"></textarea>
+
+  <button type="button" id="copy-button" class="copy-button">Copy to clipboard</button>
+
+  <div class="instruction">
+    <strong>Next:</strong> paste the block into the terminal window that is waiting for input, then press Enter.
+  </div>
+</div>
+
+<div id="error-view" class="hidden">
+  <p>QuickBooks returned an error instead of an authorization code.</p>
+  <div class="error-box">
+    <strong id="error-code">Error</strong>
+    <p id="error-description" style="margin: 0.5rem 0 0;"></p>
+  </div>
+  <p style="margin-top: 1.5rem;">Close this tab and start the flow again from the terminal.</p>
+</div>
+
+<div id="empty-view" class="hidden">
+  <p>This page is the OAuth redirect target for <em>Sailor Jupiter Bookkeeping</em>. It has nothing to do until QuickBooks sends you here with authorization parameters.</p>
+</div>
+
+<nav>
+  <a href="/">Home</a>
+  <a href="/privacy/">Privacy Policy</a>
+</nav>
+
+<script>
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var code = params.get('code');
+  var realmId = params.get('realmId');
+  var state = params.get('state');
+  var error = params.get('error');
+  var errorDescription = params.get('error_description');
+
+  var successView = document.getElementById('success-view');
+  var errorView = document.getElementById('error-view');
+  var emptyView = document.getElementById('empty-view');
+
+  if (error) {
+    document.getElementById('error-code').textContent = error;
+    document.getElementById('error-description').textContent = errorDescription || '(no description provided)';
+    errorView.classList.remove('hidden');
+    return;
+  }
+
+  if (code && realmId) {
+    var block =
+      'code=' + code + '\n' +
+      'realmId=' + realmId + '\n' +
+      'state=' + (state || '');
+    var ta = document.getElementById('callback-block');
+    ta.value = block;
+    successView.classList.remove('hidden');
+
+    var btn = document.getElementById('copy-button');
+    btn.addEventListener('click', function () {
+      ta.select();
+      ta.setSelectionRange(0, 99999);
+      var done = function () {
+        btn.textContent = 'Copied';
+        btn.classList.add('copied');
+        setTimeout(function () {
+          btn.textContent = 'Copy to clipboard';
+          btn.classList.remove('copied');
+        }, 2000);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(block).then(done, function () {
+          try { document.execCommand('copy'); done(); } catch (e) {}
+        });
+      } else {
+        try { document.execCommand('copy'); done(); } catch (e) {}
+      }
+    });
+    return;
+  }
+
+  emptyView.classList.remove('hidden');
+})();
+</script>
+</body>
+</html>
